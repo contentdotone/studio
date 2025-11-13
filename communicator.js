@@ -1,5 +1,5 @@
 /**
- * testupdate
+ * testupdate 
  * communicator.js
  * Script intended to run inside the iframe content so the parent shell can talk to it.
  * Include this file on the page rendered in the iframe, e.g.
