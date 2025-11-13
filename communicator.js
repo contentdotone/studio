@@ -23,7 +23,7 @@
   const postToParent = (type, payload = {}) => {
     if (!window.parent) return;
     window.parent.postMessage({ channel: CHANNEL, type, payload }, TARGET_PARENT_ORIGIN);
-  };
+  }; 
 
   const ensureLayoutHoverStyles = () => {
     if (document.getElementById("studio-layout-hover-style")) return;
