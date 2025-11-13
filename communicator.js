@@ -8,7 +8,7 @@
 (function () {
   const CHANNEL = "studio-shell";
 
-  /**
+  /** 
    * Update the list below with the exact origins that are allowed to control this iframe.
    * Example: ["https://studio.content.one", "http://localhost:4173"]
    */
@@ -25,8 +25,25 @@
     window.parent.postMessage({ channel: CHANNEL, type, payload }, TARGET_PARENT_ORIGIN);
   };
 
+  const ensureLayoutHoverStyles = () => {
+    if (document.getElementById("studio-layout-hover-style")) return;
+    const style = document.createElement("style");
+    style.id = "studio-layout-hover-style";
+    style.textContent = `
+      [data-studio-mode="Layout"] div {
+        transition: box-shadow 120ms ease, transform 120ms ease;
+      } 
+      [data-studio-mode="Layout"] div:hover {
+        box-shadow: 0 12px 24px rgba(15, 23, 42, 0.35), 0 0 0 1px rgba(248, 250, 252, 0.25);
+        cursor: move;
+      }
+    `;
+    document.head.appendChild(style);
+  };
+
   const applyMode = (mode) => {
     document.documentElement.setAttribute("data-studio-mode", mode);
+    if (mode === "Layout") ensureLayoutHoverStyles();
 
     const display = document.querySelector("[data-mode-display]");
     if (display) display.textContent = mode;
