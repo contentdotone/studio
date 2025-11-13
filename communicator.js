@@ -11,7 +11,7 @@
    * Update the list below with the exact origins that are allowed to control this iframe.
    * Example: ["https://studio.content.one", "http://localhost:4173"]
    */
-  const ALLOWED_PARENTS = (window.STUDIO_PARENT_ORIGINS || ["http://localhost:4173"]).filter(Boolean);
+  const ALLOWED_PARENTS = (window.STUDIO_PARENT_ORIGINS || ["http://127.0.0.1:5500"]).filter(Boolean);
   const TARGET_PARENT_ORIGIN = window.STUDIO_PARENT_TARGET_ORIGIN || "*";
 
   const isAllowedOrigin = (origin) =>
@@ -30,6 +30,9 @@
     const display = document.querySelector("[data-mode-display]");
     if (display) display.textContent = mode;
 
+    // Surface a log so automated tests or manual QA can assert the active mode quickly.
+    console.log(`[communicator] mode applied: ${mode}`);
+
     postToParent("mode-applied", { mode, at: Date.now() });
   };
 
@@ -47,4 +50,3 @@
     postToParent("child-ready", { path: window.location.pathname });
   });
 })();
-

@@ -36,7 +36,7 @@
       <iframe
         id="mode-frame"
         title="Content One canvas"
-        src="https://www.content.one"
+        src="https://ab90f66abb07cc8a49695b0b8cf92ab8-dev.webengine.zesty.io/"
         class="w-full h-screen"
         loading="lazy"
         referrerpolicy="no-referrer-when-downgrade"
@@ -54,7 +54,7 @@
 
     <script>
       const MODE_CHANNEL = "studio-shell";
-      const FRAME_ORIGIN = "https://www.content.one"; // Update to match the iframe host.
+      const FRAME_ORIGIN = "https://ab90f66abb07cc8a49695b0b8cf92ab8-dev.webengine.zesty.io"; // Update to match the iframe host.
 
       const pills = document.querySelectorAll(".mode-pill");
       const modeFrame = document.getElementById("mode-frame");
@@ -85,6 +85,7 @@
 
       const handleModeChange = (mode) => {
         activeMode = mode;
+        console.log(`[shell] switching to mode: ${mode}`);
         applyPillState();
         postModeToFrame(mode);
       };
