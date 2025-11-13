@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Studio Shell</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              display: ["Inter", "system-ui", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+  <body class="min-h-screen bg-slate-900 text-white font-display">
+    <div class="flex flex-col min-h-screen">
+      <header class="border-b border-white/10 bg-slate-900/80 backdrop-blur">
+        <div class="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
+          <div>
+            <p class="text-xs uppercase tracking-[0.3em] text-slate-400">Content Studio</p>
+            <h1 class="text-lg font-semibold">App Shell</h1>
+          </div>
+          <button
+            class="rounded-full border border-white/20 px-4 py-2 text-sm text-slate-200 hover:border-white/40 hover:text-white"
+          >
+            Save Draft
+          </button>
+        </div>
+      </header>
+
+      <iframe
+        id="mode-frame"
+        title="Content One canvas"
+        src="https://www.content.one"
+        class="w-full h-screen"
+        loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade"
+      ></iframe>
+    
+
+    <div class="pointer-events-none fixed inset-x-0 bottom-0 z-20 flex h-20 items-center justify-center px-6">
+      <div class="pointer-events-auto flex items-center gap-2 rounded-full border border-white/10 bg-slate-950/80 px-2 py-2 backdrop-blur">
+        <button class="mode-pill" data-mode="Browse">Browse</button>
+        <button class="mode-pill" data-mode="Layout">Layout</button>
+        <button class="mode-pill" data-mode="Edit">Edit</button>
+        <button class="mode-pill" data-mode="Create">Create</button>
+      </div>
+    </div>
+
+    <script>
+      const MODE_CHANNEL = "studio-shell";
+      const FRAME_ORIGIN = "https://www.content.one"; // Update to match the iframe host.
+
+      const pills = document.querySelectorAll(".mode-pill");
+      const modeFrame = document.getElementById("mode-frame");
+
+      let activeMode = "Browse";
+      let frameReady = false;
+      let queuedMode = activeMode;
+
+      const applyPillState = () => {
+        pills.forEach((pill) => {
+          const isActive = pill.dataset.mode === activeMode;
+          pill.className =
+            "mode-pill rounded-full px-4 py-2 text-sm font-medium transition " +
+            (isActive
+              ? "bg-white text-slate-900 shadow-lg shadow-amber-500/30"
+              : "text-slate-300 hover:text-white");
+        });
+      };
+
+      const postModeToFrame = (mode) => {
+        queuedMode = mode;
+        if (!modeFrame?.contentWindow || !frameReady) return;
+        modeFrame.contentWindow.postMessage(
+          { channel: MODE_CHANNEL, type: "set-mode", payload: { mode } },
+          FRAME_ORIGIN,
+        );
+      };
+
+      const handleModeChange = (mode) => {
+        activeMode = mode;
+        applyPillState();
+        postModeToFrame(mode);
+      };
+
+      pills.forEach((pill) =>
+        pill.addEventListener("click", () => {
+          handleModeChange(pill.dataset.mode);
+        }),
+      );
+
+      window.addEventListener("message", (event) => {
+        if (event.origin !== FRAME_ORIGIN) return;
+        const { channel, type, payload } = event.data || {};
+        if (channel !== MODE_CHANNEL) return;
+
+        if (type === "child-ready") {
+          frameReady = true;
+          postModeToFrame(queuedMode);
+        }
+
+        if (type === "mode-applied" && payload?.mode) {
+          console.info(`Iframe confirmed ${payload.mode} mode`, payload);
+        }
+      });
+
+      modeFrame?.addEventListener("load", () => {
+        frameReady = false; // wait for communicator handshake
+      });
+
+      applyPillState();
+      postModeToFrame(activeMode);
+    </script>
+  </body>
+</html>
