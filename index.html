@@ -48,7 +48,7 @@
         <button class="mode-pill" data-mode="Browse">Browse</button>
         <button class="mode-pill" data-mode="Layout">Layout</button>
         <button class="mode-pill" data-mode="Edit">Edit</button>
-        <button class="mode-pill" data-mode="Create">Create</button>
+        <button class="mode-pill" data-mode="Insert">Insert</button>
       </div>
     </div>
 
@@ -78,7 +78,7 @@
         queuedMode = mode;
         if (!modeFrame?.contentWindow || !frameReady) return;
         modeFrame.contentWindow.postMessage(
-          { channel: MODE_CHANNEL, type: "set-mode", payload: { mode } },
+          { channel: MODE_CHANNEL, type: "set-mode", payload: { mode, ts: Date.now() } },
           FRAME_ORIGIN,
         );
       };
@@ -107,7 +107,10 @@
         }
 
         if (type === "mode-applied" && payload?.mode) {
-          console.info(`Iframe confirmed ${payload.mode} mode`, payload);
+          console.info(
+            `Iframe confirmed ${payload.mode} mode (data-studio-mode=${payload.mode})`,
+            payload,
+          );
         }
       });
 
